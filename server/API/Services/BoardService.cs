@@ -2,21 +2,9 @@ using AutoMapper;
 using VoterAPI.Data.Repositories;
 using VoterAPI.DTOs;
 using VoterAPI.Models;
+using VoterAPI.Services.Interfaces;
 
 namespace VoterAPI.Services;
-
-public interface IBoardService
-{
-    Task<IEnumerable<BoardDto>> GetAllBoardsAsync();
-    Task<BoardDto?> GetBoardByIdAsync(int id);
-    Task<BoardDetailDto?> GetBoardWithDetailsAsync(int id, int? currentUserId = null);
-    Task<BoardDto> CreateBoardAsync(BoardCreateDto dto, int createdByUserId);
-    Task<BoardDto?> UpdateBoardAsync(int id, BoardUpdateDto dto);
-    Task<bool> ToggleVotingAsync(int id);
-    Task<bool> ToggleSuggestionsAsync(int id);
-    Task<bool> CloseBoardAsync(int id);
-    Task<bool> DeleteBoardAsync(int id);
-}
 
 public class BoardService : IBoardService
 {
@@ -41,19 +29,20 @@ public class BoardService : IBoardService
         return board == null ? null : _mapper.Map<BoardDto>(board);
     }
 
-    public async Task<BoardDetailDto?> GetBoardWithDetailsAsync(int id, int? currentUserId = null)
+    public async Task<BoardDetailDto?> GetBoardWithDetailsAsync(int id, int? currentUserId = null, bool isAdmin = false)
     {
         var board = await _boardRepository.GetBoardWithDetailsAsync(id);
         if (board == null) return null;
 
         var boardDetail = _mapper.Map<BoardDetailDto>(board);
 
-        // Filter suggestions based on status and set UserHasVoted
-        var approvedSuggestions = board.Suggestions
-            .Where(s => s.Status == SuggestionStatus.Approved && s.IsVisible)
+        // Admins see all suggestions, regular users see visible + their own pending
+        var visibleSuggestions = board.Suggestions
+            .Where(s => isAdmin || s.IsVisible || 
+                (currentUserId.HasValue && s.SubmittedByUserId == currentUserId.Value))
             .ToList();
 
-        boardDetail.Suggestions = approvedSuggestions.Select(s =>
+        boardDetail.Suggestions = visibleSuggestions.Select(s =>
         {
             var suggestionDto = _mapper.Map<SuggestionWithVotesDto>(s);
             suggestionDto.UserHasVoted = currentUserId.HasValue && 
@@ -81,14 +70,13 @@ public class BoardService : IBoardService
         var board = await _boardRepository.GetByIdAsync(id);
         if (board == null) return null;
 
-        if (dto.Title != null) board.Title = dto.Title;
-        if (dto.Description != null) board.Description = dto.Description;
-        if (dto.IsSuggestionsOpen.HasValue) board.IsSuggestionsOpen = dto.IsSuggestionsOpen.Value;
-        if (dto.IsVotingOpen.HasValue) board.IsVotingOpen = dto.IsVotingOpen.Value;
-        if (dto.RequireApproval.HasValue) board.RequireApproval = dto.RequireApproval.Value;
-        if (dto.VotingType != null) board.VotingType = Enum.Parse<VotingType>(dto.VotingType);
-        if (dto.MaxVotes.HasValue) board.MaxVotes = dto.MaxVotes;
-        if (dto.IsClosed.HasValue) board.IsClosed = dto.IsClosed.Value;
+        board.Title = dto.Title;
+        board.Description = dto.Description;
+        board.IsSuggestionsOpen = dto.IsSuggestionsOpen;
+        board.IsVotingOpen = dto.IsVotingOpen;
+        board.RequireApproval = dto.RequireApproval;
+        board.VotingType = Enum.Parse<VotingType>(dto.VotingType);
+        board.MaxVotes = dto.MaxVotes;
 
         _boardRepository.Update(board);
         await _boardRepository.SaveChangesAsync();
@@ -96,7 +84,7 @@ public class BoardService : IBoardService
         return _mapper.Map<BoardDto>(board);
     }
 
-    public async Task<bool> ToggleVotingAsync(int id)
+    public async Task<bool> ToggleVotingStatusAsync(int id)
     {
         var board = await _boardRepository.GetByIdAsync(id);
         if (board == null) return false;
@@ -108,7 +96,7 @@ public class BoardService : IBoardService
         return true;
     }
 
-    public async Task<bool> ToggleSuggestionsAsync(int id)
+    public async Task<bool> ToggleSuggestionsStatusAsync(int id)
     {
         var board = await _boardRepository.GetByIdAsync(id);
         if (board == null) return false;
@@ -120,14 +108,18 @@ public class BoardService : IBoardService
         return true;
     }
 
-    public async Task<bool> CloseBoardAsync(int id)
+    public async Task<bool> ToggleBoardStatusAsync(int id)
     {
         var board = await _boardRepository.GetByIdAsync(id);
         if (board == null) return false;
 
-        board.IsClosed = true;
-        board.IsVotingOpen = false;
-        board.IsSuggestionsOpen = false;
+        board.IsClosed = !board.IsClosed;
+        if (board.IsClosed)
+        {
+            board.IsVotingOpen = false;
+            board.IsSuggestionsOpen = false;
+        }
+        
         _boardRepository.Update(board);
         await _boardRepository.SaveChangesAsync();
 

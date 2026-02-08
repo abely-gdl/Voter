@@ -26,6 +26,15 @@ public class BoardRepository : Repository<Board>, IBoardRepository
     {
     }
 
+    public override async Task<IEnumerable<Board>> GetAllAsync()
+    {
+        return await _dbSet
+            .Include(b => b.CreatedBy)
+            .Include(b => b.Suggestions)
+                .ThenInclude(s => s.Votes)
+            .ToListAsync();
+    }
+
     public async Task<Board?> GetBoardWithDetailsAsync(int id)
     {
         return await _dbSet

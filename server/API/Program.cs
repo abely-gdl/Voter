@@ -5,6 +5,7 @@ using System.Text;
 using VoterAPI.Data;
 using VoterAPI.Data.Repositories;
 using VoterAPI.Services;
+using VoterAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

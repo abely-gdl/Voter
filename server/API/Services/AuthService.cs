@@ -2,15 +2,9 @@ using VoterAPI.Data.Repositories;
 using VoterAPI.DTOs;
 using VoterAPI.Models;
 using VoterAPI.Utils;
+using VoterAPI.Services.Interfaces;
 
 namespace VoterAPI.Services;
-
-public interface IAuthService
-{
-    Task<LoginResponseDto?> LoginAsync(LoginRequestDto request);
-    Task<LoginResponseDto?> RegisterAsync(RegisterRequestDto request);
-    Task<UserDto?> GetCurrentUserAsync(int userId);
-}
 
 public class AuthService : IAuthService
 {
