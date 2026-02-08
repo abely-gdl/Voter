@@ -53,10 +53,6 @@ A voting platform where users submit suggestions and vote on ideas. Perfect for 
 # Backend (18 tests)
 cd server/Tests
 dotnet test
-
-# Frontend
-cd client
-npm test
 ```
 
 ## API Overview
@@ -91,6 +87,10 @@ Voter/
     │   └── Utils/          # Helper utilities
     └── Tests/              # xUnit tests
 ```
+
+## Task Report
+
+[View the detailed task report](https://github.com/abely-gdl/Voter/blob/main/Task%20report.md)
 
 ## License
 
