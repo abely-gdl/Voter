@@ -20,8 +20,14 @@ export const LoginPage = () => {
       const response = await authService.login({ username, password });
       login(response.token, response.user);
       navigate('/boards');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid username or password');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Invalid username or password';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

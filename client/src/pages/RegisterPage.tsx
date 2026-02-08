@@ -32,8 +32,14 @@ export const RegisterPage = () => {
       const response = await authService.register({ username, password });
       login(response.token, response.user);
       navigate('/boards');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Username may already exist.');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Registration failed. Username may already exist.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

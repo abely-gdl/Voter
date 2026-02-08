@@ -32,8 +32,14 @@ export const CreateBoardPage = () => {
 
       const newBoard = await boardService.createBoard(boardData);
       navigate(`/boards/${newBoard.id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create board');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to create board';
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }

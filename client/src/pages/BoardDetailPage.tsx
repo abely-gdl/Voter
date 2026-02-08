@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { boardService } from '../services/boardService';
@@ -15,25 +15,25 @@ export const BoardDetailPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const { isAuthenticated, isAdmin, user } = useAuth();
 
-  useEffect(() => {
-    if (id) {
-      loadBoard();
-    }
-  }, [id]);
-
-  const loadBoard = async () => {
+  const loadBoard = useCallback(async () => {
     try {
       setLoading(true);
       const data = await boardService.getBoardDetail(Number(id));
       setBoard(data);
       setError('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Failed to load board');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      loadBoard();
+    }
+  }, [id, loadBoard]);
 
   const handleSubmitSuggestion = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +47,14 @@ export const BoardDetailPage = () => {
       });
       setSuggestionText('');
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to submit suggestion');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to submit suggestion';
+      alert(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -58,8 +64,14 @@ export const BoardDetailPage = () => {
     try {
       await voteService.vote(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to vote');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to vote';
+      alert(errorMessage);
     }
   };
 
@@ -67,8 +79,14 @@ export const BoardDetailPage = () => {
     try {
       await voteService.unvote(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to remove vote');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to remove vote';
+      alert(errorMessage);
     }
   };
 
@@ -76,8 +94,14 @@ export const BoardDetailPage = () => {
     try {
       await suggestionService.approveSuggestion(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to approve suggestion');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to approve suggestion';
+      alert(errorMessage);
     }
   };
 
@@ -85,8 +109,14 @@ export const BoardDetailPage = () => {
     try {
       await suggestionService.rejectSuggestion(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to reject suggestion');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to reject suggestion';
+      alert(errorMessage);
     }
   };
 

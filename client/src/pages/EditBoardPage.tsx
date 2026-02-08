@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { boardService } from '../services/boardService';
 import { BoardDetail } from '../types';
@@ -20,13 +20,7 @@ export const EditBoardPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (id) {
-      loadBoard();
-    }
-  }, [id]);
-
-  const loadBoard = async () => {
+  const loadBoard = useCallback(async () => {
     try {
       setLoading(true);
       const data = await boardService.getBoardDetail(Number(id));
@@ -40,12 +34,18 @@ export const EditBoardPage = () => {
         votingType: data.votingType,
         maxVotes: data.maxVotes?.toString() || '',
       });
-    } catch (err: any) {
+    } catch {
       setError('Failed to load board');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      loadBoard();
+    }
+  }, [id, loadBoard]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,8 +67,14 @@ export const EditBoardPage = () => {
 
       await boardService.updateBoard(Number(id), updateData);
       navigate(`/boards/${id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update board');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to update board';
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -82,8 +88,14 @@ export const EditBoardPage = () => {
     try {
       await boardService.deleteBoard(Number(id));
       navigate('/boards');
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete board');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to delete board';
+      alert(errorMessage);
     }
   };
 
@@ -91,8 +103,14 @@ export const EditBoardPage = () => {
     try {
       await boardService.toggleBoardStatus(Number(id));
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to toggle board status');
+    } catch (err: unknown) {
+      const errorMessage = 
+        typeof err === 'object' && err !== null && 'response' in err && 
+        typeof (err as { response?: { data?: { message?: string } } }).response === 'object' && 
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Failed to toggle board status';
+      alert(errorMessage);
     }
   };
 
