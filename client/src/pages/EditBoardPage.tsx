@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { boardService } from '../services/boardService';
 import { BoardDetail } from '../types';
-import { getErrorMessage } from '../utils/errorUtils';
 
 export const EditBoardPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,7 +24,6 @@ export const EditBoardPage = () => {
     if (id) {
       loadBoard();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadBoard = async () => {
@@ -42,7 +40,7 @@ export const EditBoardPage = () => {
         votingType: data.votingType,
         maxVotes: data.maxVotes?.toString() || '',
       });
-    } catch {
+    } catch (err: any) {
       setError('Failed to load board');
     } finally {
       setLoading(false);
@@ -69,8 +67,8 @@ export const EditBoardPage = () => {
 
       await boardService.updateBoard(Number(id), updateData);
       navigate(`/boards/${id}`);
-    } catch (err: unknown) {
-      setError(getErrorMessage(err, 'Failed to update board'));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to update board');
     } finally {
       setSubmitting(false);
     }
@@ -84,8 +82,8 @@ export const EditBoardPage = () => {
     try {
       await boardService.deleteBoard(Number(id));
       navigate('/boards');
-    } catch (err: unknown) {
-      alert(getErrorMessage(err, 'Failed to delete board'));
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete board');
     }
   };
 
@@ -93,8 +91,8 @@ export const EditBoardPage = () => {
     try {
       await boardService.toggleBoardStatus(Number(id));
       await loadBoard();
-    } catch (err: unknown) {
-      alert(getErrorMessage(err, 'Failed to toggle board status'));
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to toggle board status');
     }
   };
 

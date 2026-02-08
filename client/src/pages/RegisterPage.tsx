@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/authService';
-import { getErrorMessage } from '../utils/errorUtils';
 
 export const RegisterPage = () => {
   const [username, setUsername] = useState('');
@@ -33,8 +32,8 @@ export const RegisterPage = () => {
       const response = await authService.register({ username, password });
       login(response.token, response.user);
       navigate('/boards');
-    } catch (err: unknown) {
-      setError(getErrorMessage(err, 'Registration failed. Username may already exist.'));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Registration failed. Username may already exist.');
     } finally {
       setLoading(false);
     }

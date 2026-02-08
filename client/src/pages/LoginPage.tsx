@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/authService';
-import { getErrorMessage } from '../utils/errorUtils';
 
 export const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -21,8 +20,8 @@ export const LoginPage = () => {
       const response = await authService.login({ username, password });
       login(response.token, response.user);
       navigate('/boards');
-    } catch (err: unknown) {
-      setError(getErrorMessage(err, 'Invalid username or password'));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Invalid username or password');
     } finally {
       setLoading(false);
     }
