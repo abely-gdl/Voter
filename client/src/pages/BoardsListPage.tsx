@@ -20,7 +20,7 @@ export const BoardsListPage = () => {
       const data = await boardService.getBoards();
       setBoards(data);
       setError('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Failed to load boards');
       console.error(err);
     } finally {

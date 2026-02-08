@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { boardService } from '../services/boardService';
+import { getErrorMessage } from '../utils/errorUtils';
 
 export const CreateBoardPage = () => {
   const navigate = useNavigate();
@@ -32,8 +33,8 @@ export const CreateBoardPage = () => {
 
       const newBoard = await boardService.createBoard(boardData);
       navigate(`/boards/${newBoard.id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create board');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Failed to create board'));
     } finally {
       setSubmitting(false);
     }

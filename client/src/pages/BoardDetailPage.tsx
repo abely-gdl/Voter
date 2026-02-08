@@ -5,6 +5,7 @@ import { boardService } from '../services/boardService';
 import { suggestionService } from '../services/suggestionService';
 import { voteService } from '../services/voteService';
 import { BoardDetail } from '../types';
+import { getErrorMessage } from '../utils/errorUtils';
 
 export const BoardDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,7 @@ export const BoardDetailPage = () => {
     if (id) {
       loadBoard();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadBoard = async () => {
@@ -27,7 +29,7 @@ export const BoardDetailPage = () => {
       const data = await boardService.getBoardDetail(Number(id));
       setBoard(data);
       setError('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Failed to load board');
       console.error(err);
     } finally {
@@ -47,8 +49,8 @@ export const BoardDetailPage = () => {
       });
       setSuggestionText('');
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to submit suggestion');
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, 'Failed to submit suggestion'));
     } finally {
       setSubmitting(false);
     }
@@ -58,8 +60,8 @@ export const BoardDetailPage = () => {
     try {
       await voteService.vote(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to vote');
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, 'Failed to vote'));
     }
   };
 
@@ -67,8 +69,8 @@ export const BoardDetailPage = () => {
     try {
       await voteService.unvote(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to remove vote');
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, 'Failed to remove vote'));
     }
   };
 
@@ -76,8 +78,8 @@ export const BoardDetailPage = () => {
     try {
       await suggestionService.approveSuggestion(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to approve suggestion');
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, 'Failed to approve suggestion'));
     }
   };
 
@@ -85,8 +87,8 @@ export const BoardDetailPage = () => {
     try {
       await suggestionService.rejectSuggestion(suggestionId);
       await loadBoard();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to reject suggestion');
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, 'Failed to reject suggestion'));
     }
   };
 
