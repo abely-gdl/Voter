@@ -81,7 +81,7 @@
 
 </details>
 
-**Results:** He created a good plan with several steps and started following it. Also, I saved the plan as a prompt, but after the request to adjust the plan, he didn't adjust the previous one but created a new file. Then he started implementation. Actually, it was like the Pareto law in action. He created 80% of functionality almost with no issues. I just answered questions like "Do you want to proceed?" No tests at this point.
+**Results:** He created a good plan with several steps and started following it. Also, I saved the plan as a prompt, but after the request to adjust the plan, he didn't adjust the previous one but created a new file. Then he started implementation. Actually, it was like the Pareto rule in action. He created 80% of functionality almost with no issues. I just answered questions like "Do you want to proceed?" No tests at this point.
 
 ## Step #4 - Bug fixing
 
