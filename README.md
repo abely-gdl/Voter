@@ -33,9 +33,10 @@ A voting platform where users submit suggestions and vote on ideas. Perfect for 
    dotnet run
    ```
    API runs on `http://localhost:5076/`
+   
    Swaggger    `http://localhost:5076/swagger`
 
-2. **Frontend**
+3. **Frontend**
    ```bash
    cd client
    npm install
