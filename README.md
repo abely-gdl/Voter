@@ -69,18 +69,27 @@ npm test
 ## Project Structure
 
 ```
-├── client/          # React frontend
+Voter/
+├── client/                 # React frontend
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── services/
-│   └── tests/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Page-level components
+│   │   ├── services/       # API service layer
+│   │   ├── contexts/       # React Context (Auth)
+│   │   └── types/          # TypeScript type definitions
+│   ├── public/
+│   └── vite.config.ts
 └── server/
-    ├── API/         # .NET Web API
-    │   ├── Controllers/
-    │   ├── Services/
-    │   └── Data/
-    └── Tests/       # xUnit tests
+    ├── API/                # .NET Web API
+    │   ├── Controllers/    # API endpoints
+    │   ├── Services/       # Business logic
+    │   ├── Data/           # DbContext & Repositories
+    │   ├── Models/         # Domain entities
+    │   ├── DTOs/           # Data transfer objects
+    │   ├── Mapping/        # AutoMapper profiles
+    │   ├── Migrations/     # EF Core migrations
+    │   └── Utils/          # Helper utilities
+    └── Tests/              # xUnit tests
 ```
 
 ## License
