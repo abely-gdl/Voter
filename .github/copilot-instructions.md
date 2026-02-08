@@ -1,7 +1,21 @@
 # GitHub Copilot Instructions for Voter Application
 
 ## Project Overview
-This is a full-stack voting application with a React frontend and ASP.NET Core backend. The application allows users to create and participate in polls/votes.
+This is a full-stack Voting Boards application with a React frontend and .NET backend. The application allows users to browse boards (voting spaces), submit suggestions, and vote on them. Admins can create/manage boards and moderate suggestions.
+
+### Domain Model
+- **User**: Authentication entity with username, hashed password, role (Admin/User)
+- **Board**: A voting space with configurable rules (single/multi voting, max votes, suggestion approval, open/close status)
+- **Suggestion**: User-submitted items that can be voted on, with approval workflow for admins
+- **Vote**: User votes on suggestions, with rules enforcement (single vote vs multiple votes per board)
+
+### Authentication
+- **Simple authentication** with username/password stored in database
+- Two roles: **Admin** and **User**
+- Default admin user seeded in database (username: "admin", password: "admin123")
+- Users can register as regular users or login with existing credentials
+- JWT tokens or session-based auth for maintaining login state
+- Password hashing (BCrypt or similar) for security
 
 ## Assistant Behavior
 - **Act as Product Owner/Business Analyst**: Suggest use-cases, features, and user stories when appropriate
@@ -11,19 +25,20 @@ This is a full-stack voting application with a React frontend and ASP.NET Core b
 ## Technology Stack
 
 ### Backend
-- **Framework**: ASP.NET Core 10.0 Web API
+- **Framework**: .NET 9 Web API
 - **Language**: C# 13
 - **Testing**: xUnit, Moq, FluentAssertions
-- **Database**: Entity Framework Core (specify provider as needed)
+- **Database**: Entity Framework Core with SQLite (repository pattern ensures DB interchangeability)
 - **API Style**: RESTful
 
 ### Frontend
 - **Framework**: React 18+
 - **Language**: TypeScript
-- **Build Tool**: Vite or Create React App
-- **Testing**: Jest, React Testing Library
-- **State Management**: React Context API or Redux (specify when implemented)
-- **HTTP Client**: Axios or Fetch API
+- **Build Tool**: Vite
+- **Testing**: Vitest, React Testing Library
+- **State Management**: React Context API
+- **HTTP Client**: Axios
+- **Styling**: Tailwind CSS
 
 ## Project Structure
 
@@ -53,13 +68,14 @@ Voter/
 
 ### Backend (C#)
 - Use **async/await** for all I/O operations
-- Follow **Repository Pattern** for data access
-- Use **Dependency Injection** for all services
+- Follow **Repository Pattern** for data access (ensures database provider can be swapped easily)
+- Repositories must use interfaces (`IRepository<T>`, `IBoardRepository`, etc.)
+- Use **Dependency Injection** for all services and repositories
 - Controller actions should return `ActionResult<T>` or `IActionResult`
 - Use **DTOs** for API request/response, not direct entity models
 - Apply **data annotations** for validation
 - Follow C# naming conventions: PascalCase for classes, methods, properties
-- Use **nullable reference types** (enabled by default in .NET 10)
+- Use **nullable reference types** (enabled by default in .NET 9)
 - Implement proper error handling with middleware
 - Write XML documentation comments for public APIs
 
@@ -82,7 +98,7 @@ Voter/
   - PUT: Update entire resources
   - PATCH: Partial updates
   - DELETE: Remove resources
-- Use plural nouns for resource names: `/api/polls`, `/api/votes`
+- Use plural nouns for resource names: `/api/boards`, `/api/suggestions`, `/api/votes`
 - Return appropriate HTTP status codes
 - Use consistent response structure for errors
 
@@ -99,49 +115,53 @@ Voter/
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
-public class PollsController : ControllerBase
+public class BoardsController : ControllerBase
 {
-    private readonly IPollService _pollService;
+    private readonly IBoardService _boardService;
 
-    public PollsController(IPollService pollService)
+    public BoardsController(IBoardService boardService)
     {
-        _pollService = pollService;
+        _boardService = boardService;
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PollDto>> GetPoll(int id)
+    public async Task<ActionResult<BoardDto>> GetBoard(int id)
     {
-        var poll = await _pollService.GetPollByIdAsync(id);
-        return poll == null ? NotFound() : Ok(poll);
+        var board = await _boardService.GetBoardByIdAsync(id);
+        return board == null ? NotFound() : Ok(board);
     }
 }
 ```
 
 ### Frontend Service Example
 ```typescript
-export const pollService = {
-  async getPolls(): Promise<Poll[]> {
-    const response = await fetch('/api/polls');
-    if (!response.ok) throw new Error('Failed to fetch polls');
-    return response.json();
+import axios from 'axios';
+import { Board } from '../types';
+
+export const boardService = {
+  async getBoards(): Promise<Board[]> {
+    const response = await axios.get<Board[]>('/api/boards');
+    return response.data;
   }
 };
 ```
 
 ### React Component Example
 ```typescript
-interface PollProps {
-  pollId: number;
+interface BoardCardProps {
+  boardId: number;
 }
 
-export const PollComponent: React.FC<PollProps> = ({ pollId }) => {
-  const [poll, setPoll] = useState<Poll | null>(null);
+export const BoardCard: React.FC<BoardCardProps> = ({ boardId }) => {
+  const [board, setBoard] = useState<Board | null>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Fetch poll data
-  }, [pollId]);
+    // Fetch board data
+  }, [boardId]);
 
-  return <div>{/* Render poll */}</div>;
+  if (loading) return <LoadingSpinner />;
+  return <div>{/* Render board */}</div>;
 };
 ```
 
@@ -184,6 +204,5 @@ export const PollComponent: React.FC<PollProps> = ({ pollId }) => {
 ### Frontend
 - React Router (for routing)
 - Axios (for HTTP requests)
-- React Query or SWR (for data fetching)
-- Formik or React Hook Form (for forms)
-- Tailwind CSS or Material-UI (for styling)
+- clsx (for conditional CSS classes)
+- Tailwind CSS (for styling)
