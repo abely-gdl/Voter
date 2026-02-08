@@ -1,79 +1,86 @@
 # Voter Application
 
-A full-stack voting application built with React and .NET.
+A voting platform where users submit suggestions and vote on ideas. Perfect for feature requests, team decisions, and community feedback.
 
-## Project Structure
+## What You Can Do
 
-```
-Voter/
-├── client/           # React frontend application
-│   ├── src/         # React source code
-│   ├── public/      # Public assets
-│   └── tests/       # Frontend tests
-├── server/          # .NET backend application
-│   ├── API/         # .NET Web API project
-│   └── Tests/       # Backend tests
-└── .gitignore
-```
+- **Create Voting Boards**: Set up boards with custom rules (single/multiple votes, vote limits)
+- **Submit Suggestions**: Add ideas to any open board
+- **Vote on Ideas**: Cast votes following board-specific rules
+- **Moderate Content**: Admins can approve/reject suggestions before they go live
+- **Manage Access**: Admin and User roles with different permissions
+- **Track Results**: View vote counts and suggestion status in real-time
 
-## Getting Started
+## Tech Stack
+
+**Backend**: .NET 9 Web API, Entity Framework Core, SQLite  
+**Frontend**: React 18, TypeScript, Vite, Tailwind CSS  
+**Testing**: xUnit (backend), Vitest (frontend)
+
+## Quick Start
 
 ### Prerequisites
+- .NET 9 SDK
+- Node.js 18+
 
-- Node.js (v18 or higher)
-- .NET SDK (v8.0 or higher)
-- Git
+### Setup
 
-### Installation
-
-1. Clone the repository:
+1. **Backend**
    ```bash
-   git clone <repository-url>
-   cd Voter
+   cd server/API
+   dotnet restore
+   dotnet ef database update
+   dotnet run
    ```
+   API runs on `http://localhost:5076`
 
-2. Install frontend dependencies:
+2. **Frontend**
    ```bash
    cd client
    npm install
+   npm run dev
    ```
+   App runs on `http://localhost:5173`
 
-3. Restore backend dependencies:
-   ```bash
-   cd server
-   dotnet restore
-   ```
+### Default Login
+- **Admin**: `admin` / `admin123`
 
-### Running the Application
+## Testing
 
-#### Frontend
 ```bash
-cd client
-npm start
-```
+# Backend (18 tests)
+cd server/Tests
+dotnet test
 
-#### Backend
-```bash
-cd server/API
-dotnet run
-```
-
-### Running Tests
-
-#### Frontend Tests
-```bash
+# Frontend
 cd client
 npm test
 ```
 
-#### Backend Tests
-```bash
-cd server/Tests
-dotnet test
+## API Overview
+
+**Auth**: `/api/auth/register`, `/api/auth/login`, `/api/auth/me`  
+**Boards**: `/api/boards` - CRUD operations  
+**Suggestions**: `/api/boards/{id}/suggestions` - Create and moderate  
+**Votes**: `/api/votes` - Cast and remove votes
+
+## Project Structure
+
+```
+├── client/          # React frontend
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── services/
+│   └── tests/
+└── server/
+    ├── API/         # .NET Web API
+    │   ├── Controllers/
+    │   ├── Services/
+    │   └── Data/
+    └── Tests/       # xUnit tests
 ```
 
-## Technologies Used
+## License
 
-- **Frontend**: React, TypeScript
-- **Backend**: .NET 8, ASP.NET Core Web API
-- **Testing**: Jest (frontend), xUnit (backend)
+Educational and demonstration purposes.
