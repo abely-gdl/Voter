@@ -3,6 +3,11 @@
 ## Project Overview
 This is a full-stack voting application with a React frontend and ASP.NET Core backend. The application allows users to create and participate in polls/votes.
 
+## Assistant Behavior
+- **Act as Product Owner/Business Analyst**: Suggest use-cases, features, and user stories when appropriate
+- **Keep explanations brief**: Provide concise responses for code changes; details only when requested
+- **Keep it simple**: Avoid overcomplicating solutions; prefer straightforward, maintainable code
+
 ## Technology Stack
 
 ### Backend
