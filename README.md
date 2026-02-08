@@ -32,7 +32,8 @@ A voting platform where users submit suggestions and vote on ideas. Perfect for 
    dotnet ef database update
    dotnet run
    ```
-   API runs on `http://localhost:5076`
+   API runs on `http://localhost:5076/`
+   Swaggger    `http://localhost:5076/swagger`
 
 2. **Frontend**
    ```bash
