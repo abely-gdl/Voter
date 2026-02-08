@@ -16,8 +16,8 @@ public class MappingProfile : Profile
         CreateMap<Board, BoardDto>()
             .ForMember(dest => dest.CreatedByUsername, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Username : null))
             .ForMember(dest => dest.VotingType, opt => opt.MapFrom(src => src.VotingType.ToString()))
-            .ForMember(dest => dest.SuggestionCount, opt => opt.MapFrom(src => src.Suggestions.Count))
-            .ForMember(dest => dest.TotalVotes, opt => opt.MapFrom(src => src.Suggestions.SelectMany(s => s.Votes).Count()));
+            .ForMember(dest => dest.SuggestionCount, opt => opt.MapFrom(src => src.Suggestions.Count(s => s.Status == SuggestionStatus.Approved && s.IsVisible)))
+            .ForMember(dest => dest.TotalVotes, opt => opt.MapFrom(src => src.Suggestions.Where(s => s.Status == SuggestionStatus.Approved && s.IsVisible).SelectMany(s => s.Votes).Count()));
 
         CreateMap<Board, BoardDetailDto>()
             .ForMember(dest => dest.CreatedByUsername, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Username : null))

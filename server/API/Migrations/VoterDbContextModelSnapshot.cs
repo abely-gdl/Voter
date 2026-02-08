@@ -177,7 +177,7 @@ namespace VoterAPI.Migrations
                         {
                             Id = 1,
                             CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "$2a$11$8KzGWHLq9cY6SGoXHe7Rie4YLJ4xX/BZ1aFMZNW9YwJ2iX2zONeqW",
+                            PasswordHash = "$2a$11$cqYR9g2uzVdlt0j0txokSeLbACCohBswHulHjeEDpLcff086G.NOK",
                             Role = "Admin",
                             Username = "admin"
                         });

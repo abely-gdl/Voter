@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using VoterAPI.DTOs;
-using VoterAPI.Services;
+using VoterAPI.Services.Interfaces;
 
 namespace VoterAPI.Controllers;
 
@@ -35,13 +35,15 @@ public class BoardsController : ControllerBase
     {
         // Try to get current user ID if authenticated
         int? currentUserId = null;
+        bool isAdmin = false;
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userIdClaim != null && int.TryParse(userIdClaim, out int userId))
         {
             currentUserId = userId;
+            isAdmin = User.IsInRole("Admin");
         }
 
-        var board = await _boardService.GetBoardWithDetailsAsync(id, currentUserId);
+        var board = await _boardService.GetBoardWithDetailsAsync(id, currentUserId, isAdmin);
         if (board == null)
         {
             return NotFound();
@@ -90,7 +92,7 @@ public class BoardsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult> ToggleVoting(int id)
     {
-        var result = await _boardService.ToggleVotingAsync(id);
+        var result = await _boardService.ToggleVotingStatusAsync(id);
         if (!result)
         {
             return NotFound();
@@ -106,7 +108,7 @@ public class BoardsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult> ToggleSuggestions(int id)
     {
-        var result = await _boardService.ToggleSuggestionsAsync(id);
+        var result = await _boardService.ToggleSuggestionsStatusAsync(id);
         if (!result)
         {
             return NotFound();
@@ -116,13 +118,29 @@ public class BoardsController : ControllerBase
     }
 
     /// <summary>
-    /// Close a board (Admin only)
+    /// Toggle board open/closed status (Admin only)
+    /// </summary>
+    [HttpPut("{id}/toggle-status")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<ActionResult> ToggleBoardStatus(int id)
+    {
+        var result = await _boardService.ToggleBoardStatusAsync(id);
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Close a board (Admin only) - Deprecated, use toggle-status
     /// </summary>
     [HttpPut("{id}/close")]
     [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult> CloseBoard(int id)
     {
-        var result = await _boardService.CloseBoardAsync(id);
+        var result = await _boardService.ToggleBoardStatusAsync(id);
         if (!result)
         {
             return NotFound();

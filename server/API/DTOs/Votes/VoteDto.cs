@@ -8,8 +8,3 @@ public class VoteDto
     public string? Username { get; set; }
     public DateTime VotedDate { get; set; }
 }
-
-public class VoteCreateDto
-{
-    public int SuggestionId { get; set; }
-}

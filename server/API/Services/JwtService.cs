@@ -3,14 +3,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using VoterAPI.Models;
+using VoterAPI.Services.Interfaces;
 
 namespace VoterAPI.Services;
-
-public interface IJwtService
-{
-    string GenerateToken(User user);
-    ClaimsPrincipal? ValidateToken(string token);
-}
 
 public class JwtService : IJwtService
 {

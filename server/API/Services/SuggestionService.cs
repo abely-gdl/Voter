@@ -2,19 +2,9 @@ using AutoMapper;
 using VoterAPI.Data.Repositories;
 using VoterAPI.DTOs;
 using VoterAPI.Models;
+using VoterAPI.Services.Interfaces;
 
 namespace VoterAPI.Services;
-
-public interface ISuggestionService
-{
-    Task<IEnumerable<SuggestionDto>> GetSuggestionsByBoardIdAsync(int boardId);
-    Task<SuggestionDto?> GetSuggestionByIdAsync(int id);
-    Task<SuggestionDto> CreateSuggestionAsync(int boardId, SuggestionCreateDto dto, int submittedByUserId);
-    Task<IEnumerable<SuggestionDto>> GetPendingSuggestionsAsync();
-    Task<bool> ApproveSuggestionAsync(int id);
-    Task<bool> RejectSuggestionAsync(int id);
-    Task<bool> DeleteSuggestionAsync(int id);
-}
 
 public class SuggestionService : ISuggestionService
 {
@@ -46,7 +36,6 @@ public class SuggestionService : ISuggestionService
 
     public async Task<SuggestionDto> CreateSuggestionAsync(int boardId, SuggestionCreateDto dto, int submittedByUserId)
     {
-        // Verify board exists and suggestions are open
         var board = await _boardRepository.GetByIdAsync(boardId);
         if (board == null)
         {
@@ -62,7 +51,17 @@ public class SuggestionService : ISuggestionService
         suggestion.BoardId = boardId;
         suggestion.SubmittedByUserId = submittedByUserId;
         suggestion.SubmittedDate = DateTime.UtcNow;
-        suggestion.Status = board.RequireApproval ? SuggestionStatus.Pending : SuggestionStatus.Approved;
+        
+        if (board.RequireApproval)
+        {
+            suggestion.Status = SuggestionStatus.Pending;
+            suggestion.IsVisible = false;
+        }
+        else
+        {
+            suggestion.Status = SuggestionStatus.Approved;
+            suggestion.IsVisible = true;
+        }
 
         await _suggestionRepository.AddAsync(suggestion);
         await _suggestionRepository.SaveChangesAsync();
@@ -82,6 +81,7 @@ public class SuggestionService : ISuggestionService
         if (suggestion == null) return false;
 
         suggestion.Status = SuggestionStatus.Approved;
+        suggestion.IsVisible = true;
         _suggestionRepository.Update(suggestion);
         await _suggestionRepository.SaveChangesAsync();
 

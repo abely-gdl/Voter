@@ -88,12 +88,12 @@ public class VoterDbContext : DbContext
         var seedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         // Seed default admin user (password: admin123)
-        // Pre-computed BCrypt hash for "admin123"
+        // BCrypt hash for "admin123"
         modelBuilder.Entity<User>().HasData(new User
         {
             Id = 1,
             Username = "admin",
-            PasswordHash = "$2a$11$8KzGWHLq9cY6SGoXHe7Rie4YLJ4xX/BZ1aFMZNW9YwJ2iX2zONeqW",
+            PasswordHash = "$2a$11$cqYR9g2uzVdlt0j0txokSeLbACCohBswHulHjeEDpLcff086G.NOK",
             Role = UserRole.Admin,
             CreatedDate = seedDate
         });

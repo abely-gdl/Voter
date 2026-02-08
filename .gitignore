@@ -6,6 +6,11 @@ project.lock.json
 *.pyc
 nupkg/
 
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
 # Visual Studio Code
 .vscode/
 
@@ -46,8 +51,8 @@ coverage/
 *.log
 
 # Production
-/build
-/dist
+build/
+dist/
 
 # Misc
 .env
